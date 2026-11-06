@@ -1,0 +1,70 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Madeca Formation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap">
+<style>html,body{margin:0;background:#fff}body{font-family:"Outfit","Segoe UI",system-ui,sans-serif;padding:8px 4px}</style></head><body>
+<div id="mft" style="font-family:inherit;color:#1e1d3a">
+<style>
+#mft{--n:#2c2b55;--o:#f47b3e;--l:#e4e3ee;--s:#f6f5fa;--m:#6b6a86}
+#mft *{box-sizing:border-box}
+#mft .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+#mft .hd b{font-size:20px}
+#mft .md{font-size:12px;padding:2px 8px;border-radius:6px;background:#fff1dc;color:#a35c00}
+#mft .md.on{background:#e3f5ec;color:#1f8a62}
+#mft .wr{display:grid;grid-template-columns:240px 1fr;gap:18px}
+#mft .tr{border:1px solid var(--l);border-radius:12px;padding:10px;background:#fff;align-self:start}
+#mft .tr button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;justify-content:space-between;width:100%;padding:6px 8px;border-radius:8px;font-size:14px}
+#mft .tr button:hover,#mft .tr button.on{background:var(--s);font-weight:600}
+#mft .tr .l1{padding-left:18px}#mft .tr .l2{padding-left:30px;font-size:13px}
+#mft .tr .off{color:#aaa;cursor:default}
+#mft .tr i{font-style:normal;color:var(--m);font-size:12px}
+#mft .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+#mft input{flex:1 1 220px;border:1px solid var(--l);border-radius:999px;padding:8px 14px;font:inherit}
+#mft .cr{font-size:13px;color:var(--m);margin-bottom:10px}
+#mft .gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+#mft .cd{border:1px solid var(--l);border-radius:14px;overflow:hidden;background:#fff;cursor:pointer;display:flex;flex-direction:column}
+#mft .cd:hover{box-shadow:0 4px 14px rgba(44,43,85,.12)}
+#mft .vs{height:90px;background:linear-gradient(135deg,#fde3d2,#f9c9d4);display:flex;align-items:flex-end;padding:8px 12px;font-size:12px;color:#8a3b1b}
+#mft .vs.me{background:linear-gradient(135deg,#dfe7fb,#e5e1f7);color:#3d3a8c}
+#mft .cb{padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+#mft .cb b{font-size:15px;line-height:1.3}
+#mft .cb span{font-size:12px;color:var(--m)}
+#mft .dt{border:1px solid var(--l);border-radius:14px;background:#fff;padding:20px;margin-top:14px}
+#mft .dt h3{margin:0 0 8px;font-size:20px}
+#mft .al{background:#eaf2ff;border-left:3px solid #9cb8ee;border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px}
+#mft .bt{display:inline-block;border:0;border-radius:999px;padding:8px 16px;font:inherit;font-weight:600;font-size:13px;cursor:pointer;text-decoration:none;margin-right:8px;background:var(--n);color:#fff}
+#mft .bt.g{background:#fff;color:var(--n);border:1px solid var(--n)}
+#mft .nojs li{margin:4px 0}
+@media(max-width:700px){#mft .wr{grid-template-columns:1fr}}
+</style>
+<div class="hd"><b>Madeca Formation · version test</b><span class="md on">Version test · 4 formations</span></div>
+<ul class="nojs" id="mft-nojs"><li>Vannes de contrôle : fonctionnement et dimensionnement</li><li>Du puits au pétrole exporté : les étapes de production</li><li>Hydrates, paraffines et bouchons liquides</li><li>Comportement vibratoire : les bases des vibrations mécaniques</li></ul>
+<div class="wr" id="mft-app" hidden><nav class="tr" id="mft-tr"></nav><div><div class="bar"><input id="mft-q" type="search" placeholder="Rechercher une formation…" aria-label="Rechercher"></div><div class="cr" id="mft-cr"></div><div class="gr" id="mft-gr"></div><div id="mft-dt"></div></div></div>
+<script>
+(function(){
+var R=document.getElementById("mft");if(!R)return;
+document.getElementById("mft-nojs").hidden=true;document.getElementById("mft-app").hidden=false;
+var F=[
+{t:"Vannes de contrôle : fonctionnement et dimensionnement",p:["Énergie & Industrie","Génie des procédés"],a:"Charline AJACQUES",d:"04/11/2026",r:"Rôle, choix et dimensionnement des vannes de contrôle dans les procédés industriels (régulation, instrumentation).",v:"",id:"f93edf43-0b46-4e42-b9b9-b803c368e406"},
+{t:"Du puits au pétrole exporté : les étapes de production",p:["Énergie & Industrie","Génie des procédés","Oil & Gas","Production onshore / offshore"],a:"Charline AJACQUES",d:"04/11/2026",r:"",v:""},
+{t:"Hydrates, paraffines et bouchons liquides",p:["Énergie & Industrie","Génie des procédés","Oil & Gas","Production onshore / offshore"],a:"Céline CAI",d:"05/11/2026",r:"",v:"",id:"00774c38-c1b7-470f-8603-2d90ee03f0d2"},
+{t:"Comportement vibratoire : les bases des vibrations mécaniques",p:["Énergie & Industrie","Génie mécanique"],a:"Céline CAI",d:"06/11/2026",r:"",v:"me"}];
+var T=[["Énergie & Industrie",0],["Génie des procédés",1],["Oil & Gas",2],["Production onshore / offshore",3],["Génie mécanique",1],["Infrastructures & Ferroviaire",0,1],["Transverses",0,1]];
+var path=[],q="";
+function under(f){for(var i=0;i<path.length;i++)if(f.p[i]!==path[i])return false;return true}
+function cnt(pp){return F.filter(function(f){for(var i=0;i<pp.length;i++)if(f.p[i]!==pp[i])return false;return true}).length}
+function tree(){var h="",cur=[];var nav=document.getElementById("mft-tr");nav.innerHTML="";
+var all=document.createElement("button");all.innerHTML="Toutes les formations <i>"+F.length+"</i>";all.className=path.length?"":"on";all.onclick=function(){path=[];draw()};nav.appendChild(all);
+T.forEach(function(n){cur=cur.slice(0,n[1]);cur.push(n[0]);var pp=cur.slice();var b=document.createElement("button");b.className="l"+Math.min(n[1],2)+(n[2]?" off":"")+(pp.join("|")===path.join("|")?" on":"");b.innerHTML=n[0]+" <i>"+(n[2]?"bientôt":cnt(pp))+"</i>";if(!n[2])b.onclick=function(){path=pp;draw()};nav.appendChild(b)})}
+function draw(){tree();var cr=document.getElementById("mft-cr");cr.textContent=path.length?"Formations › "+path.join(" › "):"Toutes les formations";
+var g=document.getElementById("mft-gr");g.innerHTML="";document.getElementById("mft-dt").innerHTML="";
+F.filter(function(f){return under(f)&&(!q||f.t.toLowerCase().indexOf(q)>-1)}).forEach(function(f){var c=document.createElement("div");c.className="cd";c.tabIndex=0;
+c.innerHTML='<div class="vs '+f.v+'">'+f.p[f.p.length-1]+'</div><div class="cb"><b></b><span>'+f.a+" · "+f.d+"</span></div>";c.querySelector("b").textContent=f.t;c.onclick=function(){det(f)};c.onkeydown=function(e){if(e.key==="Enter")det(f)};g.appendChild(c)});
+if(!g.children.length)g.innerHTML='<p style="color:#6b6a86">Aucune formation ici pour l’instant.</p>'}
+function det(f){var d=document.getElementById("mft-dt");d.innerHTML='<div class="dt"><div class="cr"></div><h3></h3><p class="rs"></p><div class="al">Niveau : à compléter · Durée : à compléter · Format : à compléter · Auteur : '+f.a+'</div>'+(f.id?'<a class="bt" target="_blank" rel="noopener" href="https://madeca.wobee.fr/app/post/'+f.id+'">Ouvrir la formation</a>':'')+'<button class="bt g" type="button">Demander cette formation</button><button class="bt g" type="button">Fermer</button><p class="ms" style="font-size:13px;color:#6b6a86"></p></div>';
+d.querySelector(".cr").textContent=f.p.join(" › ");d.querySelector("h3").textContent=f.t;d.querySelector(".rs").textContent=f.r||"Résumé à compléter.";
+var b=d.querySelectorAll("button");b[0].onclick=function(){d.querySelector(".ms").textContent="Test : la demande passerait par Madeca Formation › Tickets formation."};b[1].onclick=function(){d.innerHTML=""};d.scrollIntoView({behavior:"smooth",block:"nearest"})}
+document.getElementById("mft-q").oninput=function(e){q=e.target.value.trim().toLowerCase();draw()};
+draw()})();
+</script>
+</div>
+
+</body></html>
