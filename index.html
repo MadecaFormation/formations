@@ -224,20 +224,20 @@ function suivi(){const mine=SP.flatMap(s=>s.p.map(p=>({s,p,x:pst(p)})));const co
 function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;d.style.top=Math.max(16,LY-40)+"px";document.body.appendChild(d);setTimeout(()=>d.remove(),3500)}
 function bind(){
  document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{S.path.push(b.dataset.open);S.lv="";render();toTop()});
- document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{S.path=S.path.slice(0,+b.dataset.go+1);S.sel=null;render()});
+ document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{S.path=S.path.slice(0,+b.dataset.go+1);S.sel=null;render();toTop()});
  document.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{S.lv=b.dataset.lv;render()});
  document.querySelectorAll("[data-switch]").forEach(b=>b.onclick=()=>setMode(b.dataset.switch,true));
  document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{S.path=[];S.sel={kind:"sp",i:+b.dataset.sp,title:SP[+b.dataset.sp].t};clearQ();render();toTop()});
  document.querySelectorAll("[data-topic]").forEach(b=>b.onclick=()=>{const r=findTopic(b.dataset.topic);S.path=r.path.filter(Boolean);S.sel={kind:"topic",f:r.f,title:r.f[1]};clearQ();render();toTop()});
  document.querySelectorAll("[data-pub]").forEach(b=>b.onclick=()=>{const p=PUB.find(x=>(x.id||x.t)===b.dataset.pub);const r=findTopic(p.ref);S.path=r.path.filter(Boolean);S.sel={kind:"pub",p,f:r.f,title:p.t};clearQ();render();toTop()});
- document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{S.sel=null;render()});
+ document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{S.sel=null;render();toTop()});
  document.querySelectorAll("[data-propose]").forEach(b=>b.onclick=()=>ticket("Proposition de sujet : ","Apprendre et transmettre","Proposition de sujet"));
  document.querySelectorAll("[data-depotg]").forEach(b=>b.onclick=()=>ticket("Dépôt de livrable : ","Apprendre et transmettre","Dépôt de livrable"));
  document.querySelectorAll("[data-free]").forEach(b=>b.onclick=()=>{S.free=b.dataset.free==="1";render()});
  document.querySelectorAll("[data-suivi]").forEach(b=>b.onclick=suivi);
 }
 function clearQ(){S.q="";$("#q").value=""}
-function toTop(){window.scrollTo({top:0,behavior:"smooth"})}
+function toTop(){try{const t=document.querySelector(".tabs");t.scrollIntoView({behavior:"smooth",block:"start"})}catch(e){window.scrollTo(0,0)}}
 function setMode(m,keep){S.mode=m;S.sel=null;if(!keep)S.path=[];S.lv="";history.replaceState(null,"","#"+m);render()}
 document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
 $("#q").addEventListener("input",e=>{S.q=e.target.value.trim();S.sel=null;render()});
