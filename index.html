@@ -251,7 +251,7 @@ function bind(){
  document.querySelectorAll("[data-topic]").forEach(b=>b.onclick=()=>{const r=findTopic(b.dataset.topic);S.path=r.path.filter(Boolean);S.sel={kind:"topic",f:r.f,title:r.f[1]};clearQ();render();toTop()});
  document.querySelectorAll("[data-pub]").forEach(b=>b.onclick=()=>{const p=PUB.find(x=>(x.id||x.t)===b.dataset.pub);const r=findTopic(p.ref);S.path=r.path.filter(Boolean);S.sel={kind:"pub",p,f:r.f,title:p.t};clearQ();render();toTop()});
  document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{S.sel=null;render();toTop()});
- document.querySelectorAll("[data-propose]").forEach(b=>b.onclick=()=>ticket("Proposition de sujet : ","Apprendre et transmettre","Proposition de sujet"));
+ document.querySelectorAll("[data-propose]").forEach(b=>b.onclick=()=>goWB("/app/post/category/145477b0-5bce-43f4-8820-fd3a68c9dfb4"));
  document.querySelectorAll("[data-depotg]").forEach(b=>b.onclick=()=>ticket("Dépôt de livrable : ","Apprendre et transmettre","Dépôt de livrable"));
  document.querySelectorAll("[data-free]").forEach(b=>b.onclick=()=>{S.free=b.dataset.free==="1";render()});
  document.querySelectorAll("[data-suivi]").forEach(b=>b.onclick=()=>ticket());
