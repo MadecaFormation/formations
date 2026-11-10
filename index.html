@@ -77,11 +77,12 @@ a.suj{text-decoration:none}
 .suj .soc{margin-left:6px}
 .wbl{font-size:12.5px;font-weight:600;color:var(--navy);margin-left:8px;text-decoration:underline;text-underline-offset:2px}
 .adm{color:var(--muted);margin-left:6px}
-.colhd{position:relative;overflow:hidden;border-radius:12px;color:#fff;padding:14px 14px 12px;min-height:96px;display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:10px}
+.colhd{border:0;width:100%;text-align:left;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;border-radius:12px;color:#fff;padding:14px 14px 12px;min-height:96px;display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:10px}
 .colhd svg{position:absolute;right:-8px;bottom:-12px;width:90px;opacity:.35;stroke:#fff;fill:none;stroke-width:2.2}
 .colhd b{font-size:15.5px;line-height:1.2;position:relative}
 .colhd span{font-size:12px;opacity:.9;position:relative}
-.colcards{display:flex;flex-direction:column;gap:10px}
+.colhd:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(44,43,85,.18)}
+.colcards{display:flex;flex-direction:column;gap:0}
 .card .cb b{font-size:14.5px;line-height:1.3}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{background:var(--soft);border-radius:999px;font-size:11.5px;padding:2px 9px}
@@ -204,7 +205,7 @@ function render(){
  $("#main").innerHTML=h;bind();
 }
 function isFam(k){return k.length&&k.every(t=>t.k&&t.k.length&&Array.isArray(t.k[0]))}
-function famView(cur){const F=S.mode==="formations";return `<div class="carte">`+cur.k.map(th=>{let cards;if(F){const l=th.k.flatMap(f=>(PUBBY[f[0]]||[]).map(p=>({p,f})));cards=l.length?l.map(({p,f})=>pubCard(p,f)).join(""):`<p class="small" style="text-align:center;margin:6px 0 12px">Bientôt</p>`}else{cards=th.k.map(topicCard).join("")}const nb=F?th.k.reduce((a,f)=>a+(PUBBY[f[0]]||[]).length,0):th.k.length;return `<div class="col"><div class="colhd" style="background:${gradOf(th.c||cur.c)}"><svg viewBox="0 0 64 64">${iconOf(cur.c)}</svg><b>${esc(th.n)}</b><span>${nb} ${F?"formation"+(nb>1?"s":""):"sujets"}</span></div><div class="colcards">${cards}</div></div>`}).join("")+`</div>`}
+function famView(cur){const F=S.mode==="formations";return `<div class="carte">`+cur.k.map(th=>{let cards;if(F){const l=th.k.flatMap(f=>(PUBBY[f[0]]||[]));cards=l.length?l.map(p=>`<a class="suj" ${p.id?`target="_parent" data-wb href="${WB}/app/post/${p.id}"`:""}><b>${esc(p.t)}</b><span class="dots"><span class="dot d-pub"></span><i>${esc(p.a)}</i>${soc(p)}</span></a>`).join(""):`<p class="small" style="text-align:center;margin:2px 0 6px">Bientôt</p>`}else{cards=th.k.map(f=>{const pb=PUBBY[f[0]];return `<button class="suj" data-topic="${f[0]}"><b>${esc(f[1])}</b><span class="dots"><span class="dot d-${pb?"pub":"libre"}"></span><i>${LV[f[2]]} · ${esc(f[3])}</i></span></button>`}).join("")}const nb=F?th.k.reduce((a,f)=>a+(PUBBY[f[0]]||[]).length,0):th.k.length;return `<div class="col"><button class="colhd" data-open="${th.c}" style="background:${gradOf(th.c||cur.c)}"><svg viewBox="0 0 64 64">${iconOf(cur.c)}</svg><b>${esc(th.n)}</b><span>${nb} ${F?"formation"+(nb>1?"s":""):"sujets"} ›</span></button><div class="colcards">${cards}</div></div>`}).join("")+`</div>`}
 function mosaicOf(kids,root){const F=S.mode==="formations";return `<div class="mosaic">`+kids.map((k,i)=>{const p=pubIn(k),t=items(k).length;let sub=F?(p?`${p} formation${p>1?"s":""} publiée${p>1?"s":""}`:"Bientôt"):`${t} sujets`;if(!F&&k.c==="EI-PRO"&&SP.length)sub=`Carte des sujets · ${SP.length} sujets`;const big=root?i===0:(i===0&&kids.length>3);return tile(k.c,k.n,sub,big,p&&!F?`${p} publiée${p>1?"s":""}`:(F&&p?"Disponible":""),`data-open="${k.c}"`)}).join("")+`</div>`}
 function carte(){const groups=[];SP.slice().sort((a,b)=>(a.o||0)-(b.o||0)).filter(s=>!S.free||s.p.some(p=>pst(p).k==="libre")).forEach(s=>{let g=groups.find(x=>x.n===s.d);if(!g){g={n:s.d,l:[]};groups.push(g)}g.l.push(s)});
  return `<div class="filters"><button data-free="1" aria-pressed="${!!S.free}">Seulement les sujets avec des pistes libres</button><button data-free="0" aria-pressed="${!S.free}">Tous les sujets</button></div><div class="carte">`+groups.map(g=>`<div class="col"><h3><svg viewBox="0 0 64 64">${I[SPG[Object.keys(SPG).find(k=>norm(k)===norm(g.n))]]||I.BOOK}</svg>${esc(g.n)}</h3>`+g.l.map(s=>{const st=s.p.map(pst);const lib=st.filter(x=>x.k==="libre").length;return `<button class="suj" data-sp="${SP.indexOf(s)}"><b>${esc(s.t)}</b><span class="dots">${st.map(x=>`<span class="dot d-${x.k}" title="${x.l}"></span>`).join("")}<i>${lib}/${st.length} libres</i></span></button>`}).join("")+`</div>`).join("")+`</div>`}
