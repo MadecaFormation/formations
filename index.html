@@ -141,7 +141,7 @@ details.more summary{cursor:pointer;font-weight:600;font-size:15px;padding:6px 0
 .kan .it{background:#fff;border-radius:8px;padding:8px;font-size:12.5px;margin-bottom:6px;border-left:3px solid var(--or)}
 </style></head><body><div class="wrap">
 <div id="hero"></div>
-<div class="tabs"><div class="seg" role="group" aria-label="Vue"><button data-m="formations">Bibliothèque Formations</button><button data-m="apprendre">Apprendre et transmettre</button></div><input class="search" id="q" type="search" placeholder="Rechercher une formation, un sujet, un outil…" aria-label="Rechercher"></div>
+<div class="tabs"><div class="seg" role="group" aria-label="Vue"><button data-m="formations">Bibliothèque Formations</button><button data-m="apprendre">Apprendre et transmettre</button><button data-m="proposer">Proposer un sujet</button><button data-tk>Tickets formation</button></div><input class="search" id="q" type="search" placeholder="Rechercher une formation, un sujet, un outil…" aria-label="Rechercher"></div>
 <div id="main"></div>
 </div><div id="layer"></div>
 <script>
@@ -327,7 +327,7 @@ function bind(){
 function clearQ(){S.q="";$("#q").value=""}
 function toTop(){try{const t=document.querySelector(".tabs");t.scrollIntoView({behavior:"smooth",block:"start"})}catch(e){window.scrollTo(0,0)}}
 function setMode(m,keep){S.mode=m;S.sel=null;if(!keep)S.path=[];S.lv="";history.replaceState(null,"","#"+m);render()}
-document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+document.querySelectorAll(".seg button[data-m]").forEach(b=>b.onclick=()=>setMode(b.dataset.m));document.querySelectorAll(".seg [data-tk]").forEach(b=>b.onclick=()=>ticket());
 $("#q").addEventListener("input",e=>{S.q=e.target.value.trim();S.sel=null;render()});
 render();
 </script></body></html>
