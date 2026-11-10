@@ -193,10 +193,8 @@ function render(){
  if(S.sel)return S.sel.kind==="sp"?renderSP():renderDetail();
  const ns=nodeAt(S.path),cur=ns[ns.length-1],kids=cur?cur.k:TREE,leaf=kids.length&&Array.isArray(kids[0]);const F=S.mode==="formations";
  let h=(F?"":tools())+crumb(ns);
- if(!F&&!cur&&SP.length){h+=`<h2 class="sec">Génie des procédés · sujets à transmettre</h2>`+carte()+`<h2 class="sec">Explorer tous les métiers</h2>${mosaicOf(kids,true)}`;$("#main").innerHTML=h;bind();return}
  if(cur)h+=`<h2 class="sec">${esc(cur.n)}${(CAT[S.mode==="formations"?"B":"A"]||{})[cur.c]?` <a class="wbl" target="_parent" data-wb href="${WB}/app/post/category/${CAT[S.mode==="formations"?"B":"A"][cur.c]}">Ouvrir dans Wobee ↗</a>`:""}</h2>${cur.d?`<p class="intro">${esc(cur.d)}</p>`:""}`;
  if(!F&&cur&&cur.c==="EI-PRO"&&SP.length){h+=carte();h+=`<details class="more"><summary>Tous les thèmes du référentiel Génie des procédés (${items(cur).length} sujets)</summary><div style="margin-top:12px">${mosaicOf(kids,false)}</div></details>`}
- else if(cur&&isFam(kids)){h+=famView(cur)}
  else if(!leaf){h+=mosaicOf(kids,!cur)}
  else{
   if(F){const list=kids.flatMap(f=>(PUBBY[f[0]]||[]).map(p=>({p,f})));h+=list.length?`<div class="grid">`+list.map(({p,f})=>pubCard(p,f)).join("")+`</div>`:`<div class="box" style="text-align:center;padding:26px">Aucune formation publiée dans ce thème pour l’instant.<br><br><button class="btn o" data-switch="apprendre">Voir les sujets à transmettre</button></div>`}
@@ -248,7 +246,7 @@ function bind(){
  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{S.path=S.path.slice(0,+b.dataset.go+1);S.sel=null;render();toTop()});
  document.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{S.lv=b.dataset.lv;render()});
  document.querySelectorAll("[data-switch]").forEach(b=>b.onclick=()=>setMode(b.dataset.switch,true));
- document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{S.path=[];S.sel={kind:"sp",i:+b.dataset.sp,title:SP[+b.dataset.sp].t};clearQ();render();toTop()});
+ document.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>{S.path=["EI","EI-PRO"];S.sel={kind:"sp",i:+b.dataset.sp,title:SP[+b.dataset.sp].t};clearQ();render();toTop()});
  document.querySelectorAll("[data-topic]").forEach(b=>b.onclick=()=>{const r=findTopic(b.dataset.topic);S.path=r.path.filter(Boolean);S.sel={kind:"topic",f:r.f,title:r.f[1]};clearQ();render();toTop()});
  document.querySelectorAll("[data-pub]").forEach(b=>b.onclick=()=>{const p=PUB.find(x=>(x.id||x.t)===b.dataset.pub);const r=findTopic(p.ref);S.path=r.path.filter(Boolean);S.sel={kind:"pub",p,f:r.f,title:p.t};clearQ();render();toTop()});
  document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>{S.sel=null;render();toTop()});
