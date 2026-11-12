@@ -415,4 +415,7 @@ function setMode(m,keep){S.mode=m;S.sel=null;if(!keep)S.path=[];S.lv="";history.
 document.querySelectorAll(".seg button[data-m]").forEach(b=>b.onclick=()=>setMode(b.dataset.m));document.querySelectorAll(".seg [data-tk]").forEach(b=>b.onclick=()=>ticket());
 $("#q").addEventListener("input",e=>{S.q=e.target.value.trim();S.sel=null;render()});
 render();
+
+/* Synchro : formations publiées lues depuis pub.json (mis à jour par le robot GitHub) */
+(async()=>{try{const r=await fetch("https://raw.githubusercontent.com/MadecaFormation/formations/main/pub.json?t="+Math.floor(Date.now()/60000));if(!r.ok)return;const j=await r.json();if(!j||!Array.isArray(j.posts)||!j.posts.length)return;const keep=PUB.filter(p=>p.kind==="S");PUB.length=0;PUB.push(...keep,...j.posts);for(const k in PUBBY)delete PUBBY[k];PUB.filter(p=>p.kind!=="S").forEach(p=>{(PUBBY[p.ref]=PUBBY[p.ref]||[]).push(p)});PUBT.clear();PUB.filter(p=>p.kind!=="S").forEach(p=>PUBT.set(norm(p.t),p));render()}catch(e){}})();
 </script></body></html>
