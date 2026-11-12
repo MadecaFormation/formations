@@ -8,6 +8,10 @@ const HEAD = {
   tenant: "madeca.wobee.fr",
   site: "4b022902-d9c4-4337-854c-de55b5ed73a0",
   "x-wobee-auth": "1",
+  origin: "https://madeca.wobee.fr",
+  referer: "https://madeca.wobee.fr/",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36",
+  "apollo-require-preflight": "true",
 };
 
 // Racines à parcourir : Bibliothèque TEST + Bibliothèque actuelle
