@@ -34,7 +34,7 @@ async function gql(op, query, variables) {
 }
 
 const SIGNIN = `mutation Signin($login: String!, $password: String!) { Signin(login: $login, password: $password) { accessToken } }`;
-const LIST = `query GetCategoryAndPostAppList($categoryParentUid: String!) { GetCategoryAndPostAppList(categoryParentUid: $categoryParentUid) { categories { totalCount data { uid } } posts { totalCount data { uid status author { firstname lastname } publicationDate reactions postContents { language title shortValue } } } } }`;
+const LIST = `query GetCategoryAndPostAppList($categoryParentUid: String!) { GetCategoryAndPostAppList(categoryParentUid: $categoryParentUid) { categories { totalCount data { uid } } posts { totalCount data { id uid status author { firstname lastname } publicationDate reactions postContents { language title shortValue } } } } }`;
 
 // Codes des catégories TEST, lus dans index.html (const CAT={...})
 const html = fs.readFileSync("index.html", "utf8");
@@ -84,6 +84,57 @@ async function crawl(root) {
   return out;
 }
 
+// --- Apprendre et transmettre : likes/commentaires des pistes + "Je prends" dans les commentaires ---
+const ROOT_A = "ab68ee5c-4047-4ff7-9928-19608ad16a0f";
+const COMMENTS = `query GetCommentAppList($destinationId: Int!, $destinationType: CommentDestinationType!, $limit: Int!, $offset: Int!) { GetCommentAppList(destinationId: $destinationId, destinationType: $destinationType, limit: $limit, offset: $offset) { totalCount data { id value user { firstname lastname } } } }`;
+const norm = (s) => (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/<[^>]+>/g, " ");
+const TAKE = /\bje (la |le |l'|l )?(prends|prend|m'en occupe|m en occupe|m'y colle)\b/;
+const DROP = /\bje (la |le |l'|l )?(lache|libere|rends|laisse|abandonne)\b/;
+async function crawlA() {
+  const stats = {}, takes = {};
+  const queue = [ROOT_A], seen = new Set();
+  while (queue.length) {
+    const uid = queue.shift();
+    if (seen.has(uid)) continue;
+    seen.add(uid);
+    const d = (await gql("GetCategoryAndPostAppList", LIST, { categoryParentUid: uid })).GetCategoryAndPostAppList;
+    for (const c of d.categories.data) queue.push(c.uid);
+    for (const p of d.posts.data) {
+      const lk = (p.reactions && p.reactions.Like) || 0, cm = (p.reactions && p.reactions.Comment) || 0;
+      stats[p.uid] = { lk, cm };
+      if (!cm) continue;
+      const list = (await gql("GetCommentAppList", COMMENTS, { destinationId: p.id, destinationType: "Post", limit: 100, offset: 0 })).GetCommentAppList.data;
+      let who = null;
+      for (const c of [...list].sort((a, b) => a.id - b.id)) {
+        const v = " " + norm(c.value) + " ";
+        if (TAKE.test(v)) who = short(c.user);
+        else if (DROP.test(v) && who === short(c.user)) who = null;
+      }
+      if (who) takes[p.uid] = { n: who };
+    }
+  }
+  return { stats, takes };
+}
+
+// --- Tableau "Dépôt des ressources" : statut des tickets ---
+const BOARD = "07b46184-7db5-44a0-8cd2-3559a0e984cd";
+const BOARD_Q = `query GetBoardApp($boardUid: String!) { GetBoardApp(boardUid: $boardUid) { columns { uid translations { locale fields } } } }`;
+const TICKETS_Q = `query GetBoardTicketAppList($boardUid: String!) { GetBoardTicketAppList(boardUid: $boardUid) { ticketList { uid boardColumnUid isArchived internalTicket { title } responsibles { firstname lastname } author { firstname lastname } } } }`;
+async function readBoard() {
+  const cols = {};
+  for (const c of (await gql("GetBoardApp", BOARD_Q, { boardUid: BOARD })).GetBoardApp.columns) {
+    const t = c.translations.find((x) => x.locale === "fr") || c.translations[0] || { fields: {} };
+    cols[c.uid] = t.fields.label || t.fields.name || "";
+  }
+  const out = [];
+  for (const t of (await gql("GetBoardTicketAppList", TICKETS_Q, { boardUid: BOARD })).GetBoardTicketAppList.ticketList) {
+    if (t.isArchived || !t.internalTicket) continue;
+    const resp = (t.responsibles && t.responsibles[0]) || t.author;
+    out.push({ t: t.internalTicket.title, c: cols[t.boardColumnUid] || "", r: short(resp) });
+  }
+  return out;
+}
+
 const login = process.env.WOBEE_LOGIN, password = process.env.WOBEE_PASSWORD;
 if (!login || !password) { console.log("Secrets WOBEE_LOGIN / WOBEE_PASSWORD pas encore renseignés : synchro sautée"); process.exit(0); }
 token = (await gql("Signin", SIGNIN, { login, password })).Signin.accessToken;
@@ -92,7 +143,12 @@ const all = [...(await crawl(ROOT_TEST)), ...(await crawl(ROOT_REAL))];
 const byId = new Map(all.map((p) => [p.id, p]));
 const posts = [...byId.values()].sort((a, b) => (a.iso < b.iso ? 1 : -1)).map(({ iso, ...p }) => p);
 
+let A = { stats: {}, takes: {} }, tickets = [];
+try { A = await crawlA(); } catch (e) { console.warn("Apprendre : " + e.message); }
+try { tickets = await readBoard(); } catch (e) { console.warn("Tableau : " + e.message); }
+
+const body = { posts, stats: A.stats, takes: A.takes, tickets };
 const prev = fs.existsSync("pub.json") ? JSON.parse(fs.readFileSync("pub.json", "utf8")) : null;
-if (prev && JSON.stringify(prev.posts) === JSON.stringify(posts)) { console.log(`Rien de nouveau (${posts.length} formations)`); process.exit(0); }
-fs.writeFileSync("pub.json", JSON.stringify({ updated: new Date().toISOString(), posts }, null, 1));
-console.log(`pub.json mis à jour : ${posts.length} formations`);
+if (prev) { const { updated, ...rest } = prev; if (JSON.stringify(rest) === JSON.stringify(body)) { console.log(`Rien de nouveau (${posts.length} formations, ${Object.keys(A.takes).length} pistes prises, ${tickets.length} tickets)`); process.exit(0); } }
+fs.writeFileSync("pub.json", JSON.stringify({ updated: new Date().toISOString(), ...body }, null, 1));
+console.log(`pub.json mis à jour : ${posts.length} formations, ${Object.keys(A.stats).length} pistes lues, ${Object.keys(A.takes).length} prises, ${tickets.length} tickets`);
