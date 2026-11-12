@@ -81,7 +81,7 @@ async function crawl(root) {
 }
 
 const login = process.env.WOBEE_LOGIN, password = process.env.WOBEE_PASSWORD;
-if (!login || !password) { console.error("Secrets WOBEE_LOGIN / WOBEE_PASSWORD manquants"); process.exit(1); }
+if (!login || !password) { console.log("Secrets WOBEE_LOGIN / WOBEE_PASSWORD pas encore renseignés : synchro sautée"); process.exit(0); }
 token = (await gql("Signin", SIGNIN, { login, password })).Signin.accessToken;
 
 const all = [...(await crawl(ROOT_TEST)), ...(await crawl(ROOT_REAL))];
