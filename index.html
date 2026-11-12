@@ -140,6 +140,32 @@ details.more summary{cursor:pointer;font-weight:600;font-size:15px;padding:6px 0
 .kan>div{background:var(--soft);border-radius:10px;padding:10px;min-height:120px}
 .kan h5{margin:0 0 8px;font-size:13px}
 .kan .it{background:#fff;border-radius:8px;padding:8px;font-size:12.5px;margin-bottom:6px;border-left:3px solid var(--or)}
+
+/* Style épuré : cartes blanches, illustrations au trait marine avec accent orange */
+.mosaic{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));grid-auto-rows:auto;gap:12px}
+.tile{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-height:82px;color:var(--navy);cursor:pointer;overflow:visible;transition:box-shadow .15s,transform .15s,border-color .15s}
+.tile:hover{box-shadow:0 6px 18px rgba(44,43,85,.09);border-color:#d6d2e6;transform:translateY(-1px)}
+.tile:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+.tile .art{position:relative;inset:auto;flex:0 0 54px;height:54px;border-radius:12px;display:grid;place-items:center}
+.tile .art svg,.tile.big .art svg{position:static;width:34px;height:34px;opacity:1;stroke:var(--navy);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.tile .art svg>:last-child,.card .thumb svg>:last-child{stroke:var(--or)}
+.tile:hover .art svg{opacity:1}
+.tile .tx{position:static;flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.tile .tx b,.tile.big .tx b{font-size:15px;line-height:1.25;font-weight:600;color:var(--navy);text-shadow:none}
+.tile .tx span{font-size:12.5px;color:var(--muted);opacity:1}
+.tile::after{content:"›";color:#a9a6c2;font-size:24px;line-height:1;margin-left:2px}
+.tile .pill{position:static;align-self:flex-start;margin-top:5px;font-style:normal;font-size:11.5px;font-weight:600;background:#fff0e6;color:#c4541b;border-radius:999px;padding:2px 10px}
+.tile.big{grid-column:auto;grid-row:auto;flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden}
+.tile.big .art{flex:none;height:150px;border-radius:0;border-bottom:1px solid var(--line)}
+.tile.big .art svg{width:104px;height:104px;stroke-width:1.7}
+.tile.big .tx{padding:14px 16px 16px}
+.tile.big .tx b{font-size:19px}
+.tile.big::after{display:none}
+.tile.add,.tile.pend{flex-direction:column;justify-content:center;text-align:center}
+.tile.add::after,.tile.pend::after{display:none}
+.card .thumb svg{right:16px;bottom:10px;width:62px;opacity:.95;stroke:var(--navy);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.thumb{border-bottom:1px solid var(--line)}
+.colhd{color:var(--navy)}.colhd svg{stroke:var(--navy);opacity:.6}
 </style></head><body><div class="wrap">
 <div id="hero"></div>
 <div class="tabs"><div class="seg" role="group" aria-label="Vue"><button data-m="formations">Bibliothèque Formations</button><button data-m="apprendre">Apprendre et transmettre</button><button data-m="proposer">Proposer un sujet</button><button data-tk>Tickets formation</button></div><input class="search" id="q" type="search" placeholder="Rechercher une formation, un sujet, un outil…" aria-label="Rechercher"></div>
@@ -155,6 +181,9 @@ const uu=x=>x?x.replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/,"$1-$2-$3-$4-$5"):""
 function goWB(p){const a=document.createElement("a");a.href=WB+p;a.target="_parent";a.setAttribute("data-wb","");document.body.appendChild(a);a.click();a.remove()}
 const LV={F:"Fondamentaux",A:"Avancé",E:"Expert"};
 const I={
+EI:'<path d="M4 56h56"/><path d="M10 56V28h8v28M14 28V12M11 18h6M11 23h6"/><path d="M22 56V40h16v16M25 46h2M30 46h2M35 46h2"/><path d="M40 56V36a8 8 0 0 1 16 0v20"/><path d="M50 38l-3 6h5l-3 6"/>',
+IC:'<path d="M4 56h56"/><path d="M12 56V10h28M12 16l6-6M12 22l6-6M18 10l-6 6"/><path d="M8 56h8"/><path d="M24 56V36h8v20M24 44h8"/><path d="M34 54V46c0-4 3-6 7-6h12c4 0 7 4 7 8v6zM40 46h4M47 46h4"/><path d="M34 10v6a2 2 0 1 1-2 2"/>',
+TR:'<path d="M4 56h56"/><path d="M8 48h30M11 48V28h24v20"/><path d="M42 10h14v22H42zM45 16h8M45 21h8M45 26h5"/><path d="M46 56V44M52 56V38M58 56V42"/><circle cx="23" cy="38" r="4"/>',
 PRO:'<path d="M14 58V18h10v40M19 18V8M24 26h10M24 40h10M34 22h12v36H34M8 58h50"/><circle cx="40" cy="14" r="4"/>',
 PHA:'<path d="M24 6h16M28 6v16L14 50a6 6 0 0 0 5 8h26a6 6 0 0 0 5-8L36 22V6"/><path d="M20 42h24"/>',
 MEC:'<circle cx="32" cy="32" r="9"/><path d="M32 8v8M32 48v8M8 32h8M48 32h8M15 15l6 6M43 43l6 6M15 49l6-6M43 21l6-6"/>',
@@ -186,7 +215,7 @@ LNG:'<ellipse cx="32" cy="16" rx="20" ry="7"/><path d="M12 16v30c0 4 9 7 20 7s20
 EAU:'<path d="M32 6C22 22 14 30 14 40a18 18 0 0 0 36 0C50 30 42 22 32 6z"/><path d="M24 42a8 8 0 0 0 8 8"/>',
 ALT:'<path d="M14 50C14 26 30 12 54 10c-2 24-16 40-40 40z"/><path d="M14 50L36 28"/>'};
 const GRAD=[["#f47b3e","#e8496b"],["#2c2b55","#5b4bc4"],["#e8496b","#8a3fb3"],["#1f8a62","#2c6e9e"],["#c4541b","#f2a03d"],["#3d6fd1","#2c2b55"],["#7b52c9","#e8496b"],["#2e7d8a","#1f8a62"]];
-function gradOf(code){let h=0;for(const ch of code)h=(h*31+ch.charCodeAt(0))>>>0;const g=GRAD[h%GRAD.length];return `linear-gradient(135deg,${g[0]},${g[1]})`}
+const TINT=["#fdf1e8","#edf2fa","#eef6f1","#f3f1fa"];function gradOf(code){const P={EI:"#fdf1e8",IC:"#edf2fa",TR:"#eef6f1"};if(P[code])return P[code];let h=0;for(const ch of code)h=(h*31+ch.charCodeAt(0))>>>0;return TINT[h%TINT.length]}
 const ICM={"EI-CHA":"MEC","EI-CAL":"DIG","EI-EAU":"EAU","EI-AGR":"PHA","EI-ROB":"MEC","EI-RES":"RES","BAT-MOE":"PRJ","BAT-STR":"STR","BAT-TRV":"BTP","BAT-ENV":"BTP","BAT-CVC":"THE","BAT-ELE":"ELE","BAT-SSI":"HSE","BAT-ENR":"ENR","BAT-BIM":"DIG","BAT-ARC":"BTP","BAT-EXP":"MAI","BAT-NUC":"NUC","INF-OA":"INF","INF-TUN":"INF","INF-GEO":"STR","INF-ROU":"INF","INF-EAU":"EAU","INF-TOP":"DIG","INF-ENV":"ALT","FER-SIG":"FER","FER-SYS":"FER","FER-ENE":"FEE","FER-VOI":"FEE","FER-MR":"FEE","FER-URB":"FER","FER-PRJ":"PRJ","TR-JUR":"BOOK"};
 function iconOf(code){const p=code.split("-");const k=p[1]||p[0];const mc=p[0]+"-"+p[1];return (ICM[mc]&&I[ICM[mc]])||I[k]||({EI:I.PRO,IC:I.INF,TR:I.MGT})[p[0]]||I.BOOK}
 const SPG={"Bases communes":"BOOK","Oil & Gas":"OG","Raffinage":"PRO","LNG / GNL":"LNG","Traitement de l’eau":"EAU","Énergies alternatives":"ALT"};
@@ -204,7 +233,7 @@ const FK="mfFav";function favs(){try{return JSON.parse(localStorage.getItem(FK)|
 function nodeAt(path){let lvl=TREE,out=[];for(const c of path){const n=lvl.find(x=>x.c===c);if(!n)break;out.push(n);lvl=n.k}return out}
 function hero(){if(S.mode==="proposer"){$("#hero").innerHTML=`<div class="hero"><div class="eb">Proposer un sujet · Madeca Formation</div><h1>Proposer un sujet</h1><p>Va dans la bonne catégorie et propose ton sujet. Si elle n’existe pas, ajoute-la avec le ＋ : un manager valide avant création.</p><svg class="tri" viewBox="0 0 100 100" fill="none" stroke="#f47b3e" stroke-width="5"><path d="M16 10L90 50 16 90z"/></svg></div>`;return}const A=S.mode==="apprendre";$("#hero").innerHTML=`<div class="hero"><div class="eb">${A?"Apprendre et transmettre · Madeca Formation":"Bibliothèque · Madeca Formation"}</div><h1>${A?"Carte des sujets":"Bibliothèque de formation"}</h1><p>${A?"Choisis un sujet, ouvre sa fiche et engage-toi sur une piste : présentation, cas pratique, livrable.":"Toutes les formations publiées par les consultants Madeca, rangées par domaine et par métier."}</p><svg class="tri" viewBox="0 0 100 100" fill="none" stroke="#f47b3e" stroke-width="5"><path d="M16 10L90 50 16 90z"/></svg></div>`}
 function crumb(ns){let h=`<nav class="crumb"><button data-go="-1">${({formations:"Bibliothèque",apprendre:"Apprendre et transmettre",proposer:"Proposer un sujet"})[S.mode]}</button>`;ns.forEach((n,i)=>{h+=`<span>›</span>`+(i<ns.length-1||S.sel?`<button data-go="${i}">${esc(n.n)}</button>`:`<span>${esc(n.n)}</span>`)});if(S.sel)h+=`<span>›</span><span>${esc(S.sel.title)}</span>`;return h+"</nav>"}
-function tile(code,name,sub,big,pill,attr){return `<button class="tile${big?" big":""}" ${attr} style="background:${gradOf(code)}"><div class="art"><svg viewBox="0 0 64 64">${iconOf(code)}</svg></div>${pill?`<span class="pill">${pill}</span>`:""}<div class="tx"><b>${esc(name)}</b><span>${sub}</span></div></button>`}
+function tile(code,name,sub,big,pill,attr){return `<button class="tile${big?" big":""}" ${attr}><div class="art" style="background:${gradOf(code)}"><svg viewBox="0 0 64 64">${iconOf(code)}</svg></div><div class="tx"><b>${esc(name)}</b><span>${sub}</span>${pill?`<em class="pill">${pill}</em>`:""}</div></button>`}
 function tools(){return `<div class="tools"><div><button class="btn or" data-propose>＋ Proposer un sujet</button></div><div><h4>Mon suivi</h4><button class="linkb" data-suivi>Mes tickets formation</button></div><div><h4>Légende</h4><div class="lg"><span><span class="dot d-libre"></span> Libre</span><span><span class="dot d-cours"></span> En cours</span><span><span class="dot d-livree"></span> Livrée</span><span><span class="dot d-validee"></span> Validée / publiée</span></div></div></div>`}
 function render(){
  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===S.mode));hero();
@@ -223,7 +252,7 @@ function render(){
 }
 function isFam(k){return k.length&&k.every(t=>t.k&&t.k.length&&Array.isArray(t.k[0]))}
 function famView(cur){const F=S.mode==="formations";return `<div class="carte">`+cur.k.map(th=>{let cards;if(F){const l=th.k.flatMap(f=>(PUBBY[f[0]]||[]));cards=l.length?l.map(p=>`<a class="suj" ${p.id?`target="_parent" data-wb href="${WB}/app/post/${p.id}"`:""}><b>${esc(p.t)}</b><span class="dots"><span class="dot d-pub"></span><i>${esc(p.a)}</i>${soc(p)}</span></a>`).join(""):`<p class="small" style="text-align:center;margin:2px 0 6px">Bientôt</p>`}else{cards=th.k.map(f=>{const pb=PUBBY[f[0]];return `<button class="suj" data-topic="${f[0]}"><b>${esc(f[1])}</b><span class="dots"><span class="dot d-${pb?"pub":"libre"}"></span><i>${LV[f[2]]} · ${esc(f[3])}</i></span></button>`}).join("")}const nb=F?th.k.reduce((a,f)=>a+(PUBBY[f[0]]||[]).length,0):th.k.length;return `<div class="col"><button class="colhd" data-open="${th.c}" style="background:${gradOf(th.c||cur.c)}"><svg viewBox="0 0 64 64">${iconOf(cur.c)}</svg><b>${esc(th.n)}</b><span>${nb} ${F?"formation"+(nb>1?"s":""):"sujets"} ›</span></button><div class="colcards">${cards}</div></div>`}).join("")+`</div>`}
-function mosaicOf(kids,root){const F=S.mode==="formations";return `<div class="mosaic">`+kids.map((k,i)=>{const p=pubIn(k),t=items(k).length;let sub=F?(p?`${p} formation${p>1?"s":""} publiée${p>1?"s":""}`:"Bientôt"):`${t+SPT.filter(x=>x===k.c||(k.c==="EI-PRO"&&x)).length} sujets`;const big=root?i===0:(i===0&&kids.length>3);return tile(k.c,k.n,sub,big,p&&!F?`${p} publiée${p>1?"s":""}`:(F&&p?"Disponible":""),`data-open="${k.c}"`)}).join("")+`</div>`}
+function mosaicOf(kids,root){const F=S.mode==="formations";return `<div class="mosaic">`+kids.map((k,i)=>{const p=pubIn(k),t=items(k).length;let sub=F?(p?`${p} formation${p>1?"s":""} publiée${p>1?"s":""}`:"Bientôt"):`${t+SPT.filter(x=>x===k.c||(k.c==="EI-PRO"&&x)).length} sujets`;const big=!!root;return tile(k.c,k.n,sub,big,p&&!F?`${p} publiée${p>1?"s":""}`:(F&&p?"Disponible":""),`data-open="${k.c}"`)}).join("")+`</div>`}
 const SPT=["EI-PRO-FON","EI-PRO-DIM","EI-PRO-DIM","EI-PRO-SIM","EI-PRO-DOC","EI-PRO-PROJ","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-UTI","EI-PRO-OPU","EI-PRO-OPU","EI-PRO-OPU","EI-PRO-UTI","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC","EI-PRO-SEC"];
 function spIn(code){const l=SP.map((s,i)=>({s,i})).filter(x=>SPT[x.i]===code);if(!l.length)return "";return `<p class="lab">Sujets à transmettre</p><div class="carte" style="margin:8px 0 22px">`+l.map(({s,i})=>{const st=s.p.map(pst);const lib=st.filter(x=>x.k==="libre").length;return `<button class="suj" data-sp="${i}"><b>${esc(s.t)}</b><span class="dots">${st.map(x=>`<span class="dot d-${x.k}" title="${x.l}"></span>`).join("")}<i>${lib}/${st.length} libres · ${esc(s.d)}</i></span></button>`}).join("")+`</div><p class="lab">Tous les sujets du référentiel</p>`}
 function carte(){const groups=[];SP.slice().sort((a,b)=>(a.o||0)-(b.o||0)).filter(s=>!S.free||s.p.some(p=>pst(p).k==="libre")).forEach(s=>{let g=groups.find(x=>x.n===s.d);if(!g){g={n:s.d,l:[]};groups.push(g)}g.l.push(s)});
