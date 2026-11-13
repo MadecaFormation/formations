@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-13T14:40:34.334Z",
+ "updated": "2026-11-13T15:01:45.759Z",
  "posts": [
   {
    "t": "Fondamentaux du management de projet",
@@ -11,7 +11,8 @@
    "kind": "F",
    "lk": 0,
    "cm": 0,
-   "h": "<p>dohncfoenhfc</p>"
+   "h": "<p>dohncfoenhfc</p>",
+   "hv": 2
   },
   {
    "t": "Comportement vibratoire : les bases des vibrations mécaniques",
@@ -23,7 +24,8 @@
    "kind": "F",
    "lk": 1,
    "cm": 1,
-   "h": "<p><b>🔎 A découvrir dans cette formation</b></p><p>Comprendre les vibrations mécaniques à travers le modèle masse-ressort-amortisseur et les principaux régimes vibratoires.</p><hr><p>📖 <b>Les notions abordées</b></p><ul><li>Le modèle masse-ressort-amortisseur</li><li>Les régimes libre, forcé et permanent</li><li>La fréquence fondamentale</li><li>La masse et la raideur équivalentes</li><li>Les ressorts en série et en parallèle</li></ul><hr><div class=\"pv-alert\"> N'hésite pas à laisser un commentaire pour dire ce que tu en penses !</div><hr><div class=\"pv-file\" data-file>📄 Comportement Vibratoire.pdf</div>"
+   "h": "<p><b>🔎 A découvrir dans cette formation</b></p><p>Comprendre les vibrations mécaniques à travers le modèle masse-ressort-amortisseur et les principaux régimes vibratoires.</p><hr><p>📖 <b>Les notions abordées</b></p><ul><li>Le modèle masse-ressort-amortisseur</li><li>Les régimes libre, forcé et permanent</li><li>La fréquence fondamentale</li><li>La masse et la raideur équivalentes</li><li>Les ressorts en série et en parallèle</li></ul><hr><div class=\"pv-alert\"> N'hésite pas à laisser un commentaire pour dire ce que tu en penses !</div><hr><div class=\"pv-file\" data-file data-fid=\"aef9bbf7-6e0d-46c1-9361-e0a8c26f6097\">📄 Comportement Vibratoire.pdf</div>",
+   "hv": 2
   },
   {
    "t": "Vannes de contrôle : fonctionnement et dimensionnement",
@@ -35,7 +37,8 @@
    "kind": "F",
    "lk": 1,
    "cm": 0,
-   "h": "<p>🔎 <b>À découvrir dans cette formation</b></p><p>Du fonctionnement dans une boucle de régulation à la vérification d’une vanne existante, ce support présente les notions clés et des exemples de calcul.</p><hr><p>📖 <b>Les notions abordées</b></p><ul><li>Le rôle des vannes, des actionneurs et des positionneurs</li><li>Les types de vannes et leurs caractéristiques d’écoulement</li><li>Les données nécessaires au dimensionnement et les coefficients Kv/Cv</li><li>Les écoulements monophasiques et biphasiques</li><li>La cavitation, le flashing et l’écoulement critique</li><li>La vérification d’une vanne existante et des exemples de feuilles de calcul</li></ul><div class=\"pv-alert\">N'hésite pas à laisser un commentaire pour dire ce que tu en penses !</div><hr><div class=\"pv-file\" data-file>📄 MADECA - INDUSTRIE ENERGIE- Vannes de contrôle dans les procédés industriels.pdf</div>"
+   "h": "<p>🔎 <b>À découvrir dans cette formation</b></p><p>Du fonctionnement dans une boucle de régulation à la vérification d’une vanne existante, ce support présente les notions clés et des exemples de calcul.</p><hr><p>📖 <b>Les notions abordées</b></p><ul><li>Le rôle des vannes, des actionneurs et des positionneurs</li><li>Les types de vannes et leurs caractéristiques d’écoulement</li><li>Les données nécessaires au dimensionnement et les coefficients Kv/Cv</li><li>Les écoulements monophasiques et biphasiques</li><li>La cavitation, le flashing et l’écoulement critique</li><li>La vérification d’une vanne existante et des exemples de feuilles de calcul</li></ul><div class=\"pv-alert\">N'hésite pas à laisser un commentaire pour dire ce que tu en penses !</div><hr><div class=\"pv-file\" data-file data-fid=\"e0497387-0ec0-4361-8488-80c89f41c39c\">📄 MADECA - INDUSTRIE ENERGIE- Vannes de contrôle dans les procédés industriels.pdf</div>",
+   "hv": 2
   }
  ],
  "stats": {
