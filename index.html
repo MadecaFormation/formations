@@ -200,6 +200,18 @@ svg.sc{fill:none;stroke:var(--navy);stroke-width:2;stroke-linecap:round;stroke-l
 .card .thumb svg.sc rect,.card .thumb svg.sc circle,.card .thumb svg.sc ellipse{fill:revert-layer}
 .sec{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sec::before{content:"";width:4px;height:24px;border-radius:2px;background:var(--or)}
+.pv{position:absolute;z-index:21;right:0;width:min(560px,100vw);background:#fff;box-shadow:-8px 0 30px rgba(20,20,40,.18);display:flex;flex-direction:column;border-radius:12px 0 0 12px;animation:pvin .18s ease-out}
+@keyframes pvin{from{transform:translateX(24px);opacity:0}}
+.pv header{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+.pv h3{margin:0 0 4px;font-size:19px;line-height:1.25}
+.pv .bd{padding:16px 20px;overflow:auto;flex:1;font-size:14px}
+.pv .bd p{margin:0 0 8px}.pv .bd ul,.pv .bd ol{margin:0 0 10px;padding-left:20px}.pv .bd li{margin:2px 0}.pv .bd hr{border:0;border-top:1px solid var(--line);margin:14px 0}.pv .bd h4{margin:14px 0 6px}
+.pv-alert{background:#eef3fd;border:1px solid #cddcf8;border-radius:8px;padding:10px 12px;margin:12px 0}
+.pv-file{display:flex;gap:8px;align-items:center;border:1px dashed #cfcde0;background:var(--soft);border-radius:10px;padding:16px;margin:12px 0;font-weight:600;cursor:pointer}
+.pv-file:after{content:"Lire dans Wobee ↗";margin-left:auto;font-weight:500;font-size:12px;color:var(--navy);white-space:nowrap;padding-left:8px}
+.pv-file:hover{border-color:var(--or)}
+.pv footer{display:flex;gap:8px;align-items:center;padding:12px 20px;border-top:1px solid var(--line);flex-wrap:wrap}
+.pv footer .sp{flex:1}
 </style></head><body><div class="wrap">
 <div id="hero"></div>
 <div class="tabs"><div class="seg" role="group" aria-label="Vue"><button data-m="formations">Bibliothèque Formations</button><button data-m="apprendre">Apprendre et transmettre</button><button data-m="proposer">Proposer un sujet</button><button data-tk>Tickets formation</button></div><input class="search" id="q" type="search" placeholder="Rechercher une formation, un sujet, un outil…" aria-label="Rechercher"></div>
@@ -330,6 +342,14 @@ function renderProp(){const ns=nodeAt(S.path),cur=ns[ns.length-1],kids=cur?cur.k
  document.querySelectorAll("[data-newcat]").forEach(b=>b.onclick=()=>newCat(S.path.slice()));
  document.querySelectorAll("[data-pendsub]").forEach(b=>b.onclick=()=>newSub(S.path.slice(),b.dataset.pendsub));
 }
+function preview(p){const H=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight);const h=Math.min(780,Math.max(420,H-16));const top=Math.max(8,Math.min(LY-220,H-h-8));const url=WB+"/app/post/"+p.id;
+ $("#layer").innerHTML=`<div class="scrim" data-x></div><aside class="pv" role="dialog" aria-modal="true" aria-labelledby="pvt" style="top:${top}px;height:${h}px"><header><div><h3 id="pvt">${esc(p.t)}</h3><span class="small">Publiée le ${esc(p.d)} par ${esc(p.a)}</span></div><button class="linkb" data-x aria-label="Fermer" style="text-decoration:none;font-size:24px;line-height:1">×</button></header><div class="bd">${p.h||(p.r?`<p>${esc(p.r)}</p>`:"")||`<p class="small">Aperçu en cours de chargement, ouvre la formation dans Wobee.</p>`}</div><footer><button class="btn o" data-x>Fermer</button><a class="btn o" target="_parent" data-wb data-pvopen href="${url}" title="Ouvrir dans Wobee">↗ Ouvrir</a><span class="sp"></span><a class="btn o" target="_parent" data-wb data-pvopen href="${url}">Commentaires (${p.cm||0})</a><a class="btn o" target="_parent" data-wb data-pvopen href="${url}" title="J’aime dans Wobee">♥ ${p.lk||0}</a><button class="btn o" data-pvfav aria-label="Favori">${isFav(p.id)?"★":"☆"}</button></footer></aside>`;
+ document.querySelectorAll("#layer [data-x]").forEach(b=>b.onclick=closeL);
+ document.querySelectorAll("#layer [data-file]").forEach(b=>b.onclick=()=>goWB("/app/post/"+p.id));
+ const fv=$("#layer [data-pvfav]");fv.onclick=()=>{togFav(p.id);fv.textContent=isFav(p.id)?"★":"☆";render()};
+ $("#layer .pv [data-x]").focus()}
+document.addEventListener("click",e=>{if(e.defaultPrevented||e.button||e.ctrlKey||e.metaKey||e.shiftKey)return;const a=e.target.closest("a[data-wb]");if(!a||a.hasAttribute("data-pvopen"))return;const m=(a.getAttribute("href")||"").match(/\/app\/post\/([0-9a-f-]{36})$/);if(!m)return;const p=PUB.find(x=>x.kind!=="S"&&x.id===m[1]);if(!p)return;e.preventDefault();preview(p)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#layer .pv"))closeL()});
 function closeL(){$("#layer").innerHTML=""}
 function mailTo(subj,body){const a=document.createElement("a");a.href="mailto:"+PROP_TO+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(body);a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();a.remove()}
 function modal(title,bd,ok){$("#layer").innerHTML=`<div class="scrim" data-x></div><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><header><h3 id="mt">${title}</h3><button class="linkb" data-x aria-label="Fermer" style="text-decoration:none;font-size:22px">×</button></header><div class="bd">${bd}</div><footer><button class="btn o" data-x type="button">Annuler</button><button class="btn or" id="ok" type="button">${ok}</button></footer></div>`;document.querySelectorAll("#layer [data-x]").forEach(b=>b.onclick=closeL);place()}
