@@ -20,15 +20,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - name: Lire Wobee et mettre à jour pub.json
         run: node sync.mjs
         env:
           WOBEE_LOGIN: ${{ secrets.WOBEE_LOGIN }}
           WOBEE_PASSWORD: ${{ secrets.WOBEE_PASSWORD }}
+          PREVIEW_KEY: ${{ secrets.PREVIEW_KEY }}
       - name: Enregistrer si changement
         run: |
           git config user.name "robot-formation"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pub.json
+          git add pub.json previews 2>/dev/null || git add pub.json
           git diff --cached --quiet || (git commit -m "Synchro Wobee" && git push)
