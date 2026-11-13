@@ -200,7 +200,7 @@ svg.sc{fill:none;stroke:var(--navy);stroke-width:2;stroke-linecap:round;stroke-l
 .card .thumb svg.sc rect,.card .thumb svg.sc circle,.card .thumb svg.sc ellipse{fill:revert-layer}
 .sec{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sec::before{content:"";width:4px;height:24px;border-radius:2px;background:var(--or)}
-.pv{position:absolute;z-index:21;right:0;width:min(560px,100vw);background:#fff;box-shadow:-8px 0 30px rgba(20,20,40,.18);display:flex;flex-direction:column;border-radius:12px 0 0 12px;animation:pvin .18s ease-out}
+.pv{position:absolute;z-index:21;right:0;width:min(700px,100vw);background:#fff;box-shadow:-8px 0 30px rgba(20,20,40,.18);display:flex;flex-direction:column;border-radius:12px 0 0 12px;animation:pvin .18s ease-out}
 @keyframes pvin{from{transform:translateX(24px);opacity:0}}
 .pv header{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid var(--line)}
 .pv h3{margin:0 0 4px;font-size:19px;line-height:1.25}
@@ -212,6 +212,10 @@ svg.sc{fill:none;stroke:var(--navy);stroke-width:2;stroke-linecap:round;stroke-l
 .pv-file:hover{border-color:var(--or)}
 .pv footer{display:flex;gap:8px;align-items:center;padding:12px 20px;border-top:1px solid var(--line);flex-wrap:wrap}
 .pv footer .sp{flex:1}
+.pv-pdfw{margin:12px 0;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.pv-pdf{width:100%;height:560px;border:1px solid var(--line);border-radius:8px;background:var(--soft)}
+.pv-file.ld:after{content:"Chargement de l’aperçu…"}
+
 </style></head><body><div class="wrap">
 <div id="hero"></div>
 <div class="tabs"><div class="seg" role="group" aria-label="Vue"><button data-m="formations">Bibliothèque Formations</button><button data-m="apprendre">Apprendre et transmettre</button><button data-m="proposer">Proposer un sujet</button><button data-tk>Tickets formation</button></div><input class="search" id="q" type="search" placeholder="Rechercher une formation, un sujet, un outil…" aria-label="Rechercher"></div>
@@ -342,12 +346,17 @@ function renderProp(){const ns=nodeAt(S.path),cur=ns[ns.length-1],kids=cur?cur.k
  document.querySelectorAll("[data-newcat]").forEach(b=>b.onclick=()=>newCat(S.path.slice()));
  document.querySelectorAll("[data-pendsub]").forEach(b=>b.onclick=()=>newSub(S.path.slice(),b.dataset.pendsub));
 }
+const PVK=(()=>{let k=null;try{k=new URLSearchParams(location.search).get("k")}catch(e){}try{if(k)sessionStorage.setItem("mfK",k);else k=sessionStorage.getItem("mfK")}catch(e){}return k})();
+let PVKEY=null;const PDFC={};
+async function pvKey(){if(!PVK||!window.crypto||!crypto.subtle)return null;if(!PVKEY){const b=atob(PVK.replace(/-/g,"+").replace(/_/g,"/")+"===".slice((PVK.length+3)%4));PVKEY=await crypto.subtle.importKey("raw",Uint8Array.from(b,c=>c.charCodeAt(0)),"AES-GCM",false,["decrypt"])}return PVKEY}
+async function loadPdfs(){const els=[...document.querySelectorAll("#layer [data-fid]")];if(!els.length)return;let key=null;try{key=await pvKey()}catch(e){}if(!key)return;
+ for(const el of els){const fid=el.dataset.fid,name=el.textContent.replace(/^📄\s*/,"").trim();el.classList.add("ld");try{let url=PDFC[fid];if(!url){const r=await fetch("previews/"+fid+".bin");if(!r.ok)throw new Error(r.status);const buf=new Uint8Array(await r.arrayBuffer());const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:buf.slice(0,12)},key,buf.slice(12));url=PDFC[fid]=URL.createObjectURL(new Blob([pt],{type:"application/pdf"}))}if(!el.isConnected)return;const w=document.createElement("div");w.className="pv-pdfw";w.innerHTML=`<iframe class="pv-pdf" title="${esc(name)}" src="${url}#view=FitH"></iframe><a class="small" href="${url}" download="${esc(name)}">Télécharger le PDF</a>`;el.replaceWith(w)}catch(e){el.classList.remove("ld")}}}
 function preview(p){const H=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight);const h=Math.min(780,Math.max(420,H-16));const top=Math.max(8,Math.min(LY-220,H-h-8));const url=WB+"/app/post/"+p.id;
  $("#layer").innerHTML=`<div class="scrim" data-x></div><aside class="pv" role="dialog" aria-modal="true" aria-labelledby="pvt" style="top:${top}px;height:${h}px"><header><div><h3 id="pvt">${esc(p.t)}</h3><span class="small">Publiée le ${esc(p.d)} par ${esc(p.a)}</span></div><button class="linkb" data-x aria-label="Fermer" style="text-decoration:none;font-size:24px;line-height:1">×</button></header><div class="bd">${p.h||(p.r?`<p>${esc(p.r)}</p>`:"")||`<p class="small">Aperçu en cours de chargement, ouvre la formation dans Wobee.</p>`}</div><footer><button class="btn o" data-x>Fermer</button><a class="btn o" target="_parent" data-wb data-pvopen href="${url}" title="Ouvrir dans Wobee">↗ Ouvrir</a><span class="sp"></span><a class="btn o" target="_parent" data-wb data-pvopen href="${url}">Commentaires (${p.cm||0})</a><a class="btn o" target="_parent" data-wb data-pvopen href="${url}" title="J’aime dans Wobee">♥ ${p.lk||0}</a><button class="btn o" data-pvfav aria-label="Favori">${isFav(p.id)?"★":"☆"}</button></footer></aside>`;
  document.querySelectorAll("#layer [data-x]").forEach(b=>b.onclick=closeL);
  document.querySelectorAll("#layer [data-file]").forEach(b=>b.onclick=()=>goWB("/app/post/"+p.id));
  const fv=$("#layer [data-pvfav]");fv.onclick=()=>{togFav(p.id);fv.textContent=isFav(p.id)?"★":"☆";render()};
- $("#layer .pv [data-x]").focus()}
+ $("#layer .pv [data-x]").focus();loadPdfs()}
 document.addEventListener("click",e=>{if(e.defaultPrevented||e.button||e.ctrlKey||e.metaKey||e.shiftKey)return;const a=e.target.closest("a[data-wb]");if(!a||a.hasAttribute("data-pvopen"))return;const m=(a.getAttribute("href")||"").match(/\/app\/post\/([0-9a-f-]{36})$/);if(!m)return;const p=PUB.find(x=>x.kind!=="S"&&x.id===m[1]);if(!p)return;e.preventDefault();preview(p)});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#layer .pv"))closeL()});
 function closeL(){$("#layer").innerHTML=""}
