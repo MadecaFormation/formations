@@ -142,6 +142,7 @@ const escH = (t) => String(t || "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
 // garde seulement gras / italique / souligné / retours à la ligne
 const inline = (t) => escH(String(t || "").replace(/<br\s*\/?>/gi, "\n").replace(/<(\/?)(b|strong|i|em|u)(\s[^>]*)?>/gi, "\u0001$1$2\u0002").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'"))
   .replace(/\u0001(\/?)(b|strong|i|em|u)\u0002/gi, (m, c, t) => `<${c}${{ strong: "b", em: "i" }[t.toLowerCase()] || t.toLowerCase()}>`).replace(/\n/g, "<br>");
+const FILES = new Set();
 function blocksToHtml(value) {
   let doc; try { doc = typeof value === "string" ? JSON.parse(value) : value; } catch (e) { return ""; }
   const out = [];
@@ -154,7 +155,12 @@ function blocksToHtml(value) {
     else if (b.type === "delimiter") out.push("<hr>");
     else if (b.type === "alert") out.push(`<div class="pv-alert">${inline(d.message)}</div>`);
     else if (b.type === "quote") out.push(`<blockquote>${inline(d.text)}</blockquote>`);
-    else if (/attach|pdf|file/i.test(b.type)) out.push(`<div class="pv-file" data-file>📄 ${escH((d.file && d.file.title) || d.title || "Support")}</div>`);
+    else if (/attach|pdf|file/i.test(b.type)) {
+      const u = (d.file && d.file.url) || "", fid = (u.match(/uploaded-file\/([0-9a-f-]{36})/) || [])[1];
+      const isPdf = b.type === "attaches_pdf" || /\.pdf$/i.test((d.file && (d.file.title || d.file.name)) || d.title || "");
+      if (fid && isPdf) FILES.add(fid);
+      out.push(`<div class="pv-file" data-file${fid && isPdf ? ` data-fid="${fid}"` : ""}>📄 ${escH((d.file && d.file.title) || d.title || "Support")}</div>`);
+    }
     else if (/image|video|embed/i.test(b.type)) out.push(`<div class="pv-file" data-file>🖼️ ${escH(d.caption ? String(d.caption).replace(/<[^>]*>/g, "") : "Média à voir dans Wobee")}</div>`);
   }
   return out.join("");
@@ -171,13 +177,37 @@ const prevAll = fs.existsSync("pub.json") ? JSON.parse(fs.readFileSync("pub.json
 const cache = new Map(((prevAll && prevAll.posts) || []).filter((p) => p.h != null).map((p) => [p.id, p]));
 for (const p of posts) {
   const c = cache.get(p.id);
-  if (c && c.t === p.t && c.r === p.r) { p.h = c.h; continue; }
+  if (c && c.hv === 2 && c.t === p.t && c.r === p.r) { p.h = c.h; p.hv = 2; for (const m of (c.h || "").matchAll(/data-fid="([0-9a-f-]{36})"/g)) FILES.add(m[1]); continue; }
   try {
     const d = (await gql("GetPostApp", CONTENT, { postUid: p.id, language: "fr" })).GetPostApp;
     const fr = (d.postContents || []).find((x) => x.language === "fr" && x.value) || (d.postContents || []).find((x) => x.value) || {};
     p.h = blocksToHtml(fr.value).slice(0, 60000);
+    p.hv = 2;
   } catch (e) { console.warn("Contenu " + p.id + " : " + e.message); }
 }
+
+// --- PDF chiffrés pour l'aperçu (clé PREVIEW_KEY, la même que dans l'adresse de l'iframe Wobee) ---
+const PKEY = process.env.PREVIEW_KEY;
+if (PKEY) {
+  const { webcrypto } = await import("node:crypto");
+  const raw = Buffer.from(PKEY.replace(/-/g, "+").replace(/_/g, "/"), "base64");
+  const key = await webcrypto.subtle.importKey("raw", raw, "AES-GCM", false, ["encrypt"]);
+  fs.mkdirSync("previews", { recursive: true });
+  for (const fid of FILES) {
+    const dest = `previews/${fid}.bin`;
+    if (fs.existsSync(dest)) continue;
+    try {
+      const r = await fetch(`https://prod-api.wobee.fr/uploaded-file/${fid}`, { headers: { ...HEAD, authorization: "Bearer " + token } });
+      if (!r.ok) { console.warn(`PDF ${fid} : HTTP ${r.status}`); continue; }
+      const buf = Buffer.from(await r.arrayBuffer());
+      if (buf.length > 40e6) { console.warn(`PDF ${fid} trop gros (${buf.length})`); continue; }
+      const iv = webcrypto.getRandomValues(new Uint8Array(12));
+      const ct = Buffer.from(await webcrypto.subtle.encrypt({ name: "AES-GCM", iv }, key, buf));
+      fs.writeFileSync(dest, Buffer.concat([Buffer.from(iv), ct]));
+      console.log(`PDF chiffré : ${fid} (${Math.round(buf.length / 1024)} Ko)`);
+    } catch (e) { console.warn(`PDF ${fid} : ${e.message}`); }
+  }
+} else console.log("PREVIEW_KEY absente : pas d'aperçu PDF");
 
 let A = { stats: {}, takes: {} }, tickets = [];
 try { A = await crawlA(); } catch (e) { console.warn("Apprendre : " + e.message); }
