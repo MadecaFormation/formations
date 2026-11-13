@@ -135,6 +135,31 @@ async function readBoard() {
   return out;
 }
 
+
+// --- Contenu des formations pour le panneau d'aperçu (lu une fois par formation, puis gardé en cache) ---
+const CONTENT = `query GetPostApp($postUid: String!, $language: String!) { GetPostApp(postUid: $postUid, language: $language) { postContents { language title value } } }`;
+const escH = (t) => String(t || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+// garde seulement gras / italique / souligné / retours à la ligne
+const inline = (t) => escH(String(t || "").replace(/<br\s*\/?>/gi, "\n").replace(/<(\/?)(b|strong|i|em|u)(\s[^>]*)?>/gi, "\u0001$1$2\u0002").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'"))
+  .replace(/\u0001(\/?)(b|strong|i|em|u)\u0002/gi, (m, c, t) => `<${c}${{ strong: "b", em: "i" }[t.toLowerCase()] || t.toLowerCase()}>`).replace(/\n/g, "<br>");
+function blocksToHtml(value) {
+  let doc; try { doc = typeof value === "string" ? JSON.parse(value) : value; } catch (e) { return ""; }
+  const out = [];
+  const items = (l) => (l || []).map((it) => `<li>${inline(typeof it === "string" ? it : it.content || it.text || "")}${it && it.items && it.items.length ? `<ul>${items(it.items)}</ul>` : ""}</li>`).join("");
+  for (const b of (doc && doc.blocks) || []) {
+    const d = b.data || {};
+    if (b.type === "paragraph") { const h = inline(d.text); if (h.replace(/<[^>]+>/g, "").trim()) out.push(`<p>${h}</p>`); }
+    else if (b.type === "header") out.push(`<h4>${inline(d.text)}</h4>`);
+    else if (b.type === "list") out.push(d.style === "ordered" ? `<ol>${items(d.items)}</ol>` : `<ul>${items(d.items)}</ul>`);
+    else if (b.type === "delimiter") out.push("<hr>");
+    else if (b.type === "alert") out.push(`<div class="pv-alert">${inline(d.message)}</div>`);
+    else if (b.type === "quote") out.push(`<blockquote>${inline(d.text)}</blockquote>`);
+    else if (/attach|pdf|file/i.test(b.type)) out.push(`<div class="pv-file" data-file>📄 ${escH((d.file && d.file.title) || d.title || "Support")}</div>`);
+    else if (/image|video|embed/i.test(b.type)) out.push(`<div class="pv-file" data-file>🖼️ ${escH(d.caption ? String(d.caption).replace(/<[^>]*>/g, "") : "Média à voir dans Wobee")}</div>`);
+  }
+  return out.join("");
+}
+
 const login = process.env.WOBEE_LOGIN, password = process.env.WOBEE_PASSWORD;
 if (!login || !password) { console.log("Secrets WOBEE_LOGIN / WOBEE_PASSWORD pas encore renseignés : synchro sautée"); process.exit(0); }
 token = (await gql("Signin", SIGNIN, { login, password })).Signin.accessToken;
@@ -142,6 +167,17 @@ token = (await gql("Signin", SIGNIN, { login, password })).Signin.accessToken;
 const all = [...(await crawl(ROOT_TEST)), ...(await crawl(ROOT_REAL))];
 const byId = new Map(all.map((p) => [p.id, p]));
 const posts = [...byId.values()].sort((a, b) => (a.iso < b.iso ? 1 : -1)).map(({ iso, ...p }) => p);
+const prevAll = fs.existsSync("pub.json") ? JSON.parse(fs.readFileSync("pub.json", "utf8")) : null;
+const cache = new Map(((prevAll && prevAll.posts) || []).filter((p) => p.h != null).map((p) => [p.id, p]));
+for (const p of posts) {
+  const c = cache.get(p.id);
+  if (c && c.t === p.t && c.r === p.r) { p.h = c.h; continue; }
+  try {
+    const d = (await gql("GetPostApp", CONTENT, { postUid: p.id, language: "fr" })).GetPostApp;
+    const fr = (d.postContents || []).find((x) => x.language === "fr" && x.value) || (d.postContents || []).find((x) => x.value) || {};
+    p.h = blocksToHtml(fr.value).slice(0, 60000);
+  } catch (e) { console.warn("Contenu " + p.id + " : " + e.message); }
+}
 
 let A = { stats: {}, takes: {} }, tickets = [];
 try { A = await crawlA(); } catch (e) { console.warn("Apprendre : " + e.message); }
