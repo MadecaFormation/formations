@@ -1,8 +1,8 @@
 {
- "updated": "2026-11-12T18:16:15.502Z",
+ "updated": "2026-11-13T10:53:26.649Z",
  "posts": [
   {
-   "t": "Test",
+   "t": "Fondamentaux du management de projet",
    "ref": "EI-PRJ",
    "a": "Céline C.",
    "d": "12/11/2026",
@@ -588,6 +588,11 @@
   {
    "t": "PSV BIS",
    "c": "En cours de validation",
+   "r": "Céline C."
+  },
+  {
+   "t": "Schémas électriques : unifilaires, développés, borniers",
+   "c": "Déposer une ressource",
    "r": "Céline C."
   }
  ]
