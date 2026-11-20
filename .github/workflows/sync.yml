@@ -1,8 +1,8 @@
 name: Synchro Wobee
 
 on:
-  schedule:
-    - cron: "*/15 * * * *"
+  # schedule:  (en pause pendant la bascule en version réelle)
+  #   - cron: "*/15 * * * *"
   workflow_dispatch:
 
 permissions:
