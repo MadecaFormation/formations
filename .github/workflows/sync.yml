@@ -1,8 +1,8 @@
 name: Synchro Wobee
 
 on:
-  # schedule:  (en pause pendant la bascule en version réelle)
-  #   - cron: "*/15 * * * *"
+  schedule:
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -31,5 +31,5 @@ jobs:
         run: |
           git config user.name "robot-formation"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pub.json previews 2>/dev/null || git add pub.json
+          git add pub.json drafts.json previews 2>/dev/null || git add pub.json drafts.json
           git diff --cached --quiet || (git commit -m "Synchro Wobee" && git push)
