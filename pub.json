@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-20T12:06:47.292Z",
+ "updated": "2026-11-20T14:30:02.624Z",
  "posts": [
   {
    "t": "Fondamentaux du management de projet",
@@ -32,22 +32,12 @@
  "takes": {},
  "tickets": [
   {
-   "t": "Test bis",
-   "c": "Déposer une ressource",
-   "r": "Céline C."
-  },
-  {
-   "t": "Formation PSV",
-   "c": "Déposer une ressource",
-   "r": "Céline C."
-  },
-  {
    "t": "Schémas électriques : unifilaires, développés, borniers",
    "c": "Ressource validée",
    "r": "Céline C."
   },
   {
-   "t": "PSV BIS",
+   "t": "Test bis",
    "c": "Ressource validée",
    "r": "Céline C."
   }
