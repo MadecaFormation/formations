@@ -1,9 +1,9 @@
 {
- "updated": "2026-11-20T11:02:20.213Z",
+ "updated": "2026-11-20T12:06:47.292Z",
  "posts": [
   {
    "t": "Fondamentaux du management de projet",
-   "ref": "EI-PRJ-PM",
+   "ref": "EI-PRJ-PM-001",
    "a": "Céline C.",
    "d": "15/01/2020",
    "r": "",
@@ -16,7 +16,7 @@
   },
   {
    "t": "Comportement vibratoire : les bases des vibrations mécaniques",
-   "ref": "EI-MEC-CAL",
+   "ref": "EI-MEC-CAL-009",
    "a": "Céline C.",
    "d": "15/01/2020",
    "r": "",
