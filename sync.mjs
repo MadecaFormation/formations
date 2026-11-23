@@ -126,17 +126,20 @@ async function crawlA() {
 const BOARD = "07b46184-7db5-44a0-8cd2-3559a0e984cd";
 const BOARD_Q = `query GetBoardApp($boardUid: String!) { GetBoardApp(boardUid: $boardUid) { columns { uid translations { locale fields } } } }`;
 const TICKETS_Q = `query GetBoardTicketAppList($boardUid: String!) { GetBoardTicketAppList(boardUid: $boardUid) { ticketList { uid boardColumnUid isArchived internalTicket { title } responsibles { firstname lastname } author { firstname lastname } } } }`;
+const PROD_BOARD = "e3508abc-6c40-4ea3-8bfe-d1a71b44e684"; // Sujets en cours de production
 async function readBoard() {
-  const cols = {};
-  for (const c of (await gql("GetBoardApp", BOARD_Q, { boardUid: BOARD })).GetBoardApp.columns) {
-    const t = c.translations.find((x) => x.locale === "fr") || c.translations[0] || { fields: {} };
-    cols[c.uid] = t.fields.label || t.fields.name || "";
-  }
   const out = [];
-  for (const t of (await gql("GetBoardTicketAppList", TICKETS_Q, { boardUid: BOARD })).GetBoardTicketAppList.ticketList) {
-    if (t.isArchived || !t.internalTicket) continue;
-    const resp = (t.responsibles && t.responsibles[0]) || t.author;
-    out.push({ t: t.internalTicket.title, c: cols[t.boardColumnUid] || "", r: short(resp) });
+  for (const b of [PROD_BOARD, BOARD]) {
+    const cols = {};
+    for (const c of (await gql("GetBoardApp", BOARD_Q, { boardUid: b })).GetBoardApp.columns) {
+      const t = c.translations.find((x) => x.locale === "fr") || c.translations[0] || { fields: {} };
+      cols[c.uid] = t.fields.label || t.fields.name || "";
+    }
+    for (const t of (await gql("GetBoardTicketAppList", TICKETS_Q, { boardUid: b })).GetBoardTicketAppList.ticketList) {
+      if (t.isArchived || !t.internalTicket) continue;
+      const resp = (t.responsibles && t.responsibles[0]) || t.author;
+      out.push({ t: t.internalTicket.title, c: cols[t.boardColumnUid] || "", r: short(resp) });
+    }
   }
   return out;
 }
@@ -149,7 +152,7 @@ const TREE = JSON.parse(html.slice(html.indexOf("const TREE=") + 11, html.indexO
 const TOP = {}, BYNAME = {};
 (function w(n, sc) { if (Array.isArray(n)) { TOP[n[0]] = { t: n[1], sc, lv: n[2], ty: n[3] }; BYNAME[norm(n[1]).replace(/\s+/g, " ").trim()] = n[0]; return; } (n.k || []).forEach((k) => w(k, n.c)); })({ k: TREE });
 const APPR_URL = "https://madeca.wobee.fr/app/content/ec9e3565-bd32-499e-a881-3d33d3ac4399";
-const TFULL_Q = `query GetBoardTicketAppList($boardUid: String!) { GetBoardTicketAppList(boardUid: $boardUid) { ticketList { uid boardColumnUid isArchived description internalTicket { title } attachments { uid name mimeType } responsibles { uid } author { uid } } } }`;
+const TFULL_Q = `query GetBoardTicketAppList($boardUid: String!) { GetBoardTicketAppList(boardUid: $boardUid) { ticketList { uid boardColumnUid isArchived description internalTicket { title ticketCategoryUid } attachments { uid name mimeType } responsibles { uid } author { uid } } } }`;
 const TCOM_Q = `query GetTicketCommentAppList($ticketUid: String!) { GetTicketCommentAppList(ticketUid: $ticketUid) { attachments { uid name mimeType } } }`;
 const TCOM_ADD = `mutation CreateTicketCommentApp($ticketUid: String!, $value: String!, $filesToUpload: [Upload!]!) { CreateTicketCommentApp(ticketUid: $ticketUid, value: $value, filesToUpload: $filesToUpload) { id } }`;
 const CREATE_POST = `mutation CreatePostConfig($authorUid: String!, $publicationDate: DateTime!, $status: PostStatusType!, $categoriesUid: [String!]!, $postContents: [PostContentConfigInput!]!, $sendNotification: Boolean!, $hideDuringPreboarding: Boolean!, $criteriaSelections: [CriteriaSelectionInput!]!) { CreatePostConfig(authorUid: $authorUid, publicationDate: $publicationDate, status: $status, categoriesUid: $categoriesUid, postContents: $postContents, sendNotification: $sendNotification, hideDuringPreboarding: $hideDuringPreboarding, criteriaSelections: $criteriaSelections) { uid } }`;
@@ -160,6 +163,10 @@ async function makeDrafts() {
     for (const c of (await gql("GetBoardApp", BOARD_Q, { boardUid: BOARD })).GetBoardApp.columns) { const t = c.translations.find((x) => x.locale === "fr") || c.translations[0] || { fields: {} }; cols[c.uid] = t.fields.label || ""; }
     list = (await gql("GetBoardTicketAppList", TFULL_Q, { boardUid: BOARD })).GetBoardTicketAppList.ticketList;
   } catch (e) { console.warn("Brouillons : " + e.message); return; }
+  const TC = {};
+  try { for (const c of (await gql("GetTicketCategoryConfigList", `query GetTicketCategoryConfigList($boardUid: String!, $limit: Int) { GetTicketCategoryConfigList(boardUid: $boardUid, limit: $limit) { data { uid translations { locale fields } } } }`, { boardUid: BOARD, limit: 200 })).GetTicketCategoryConfigList.data) TC[c.uid] = norm(((c.translations.find((x) => x.locale === "fr") || c.translations[0] || {}).fields || {}).label || "").replace(/^[a-z]+\s*[–-]\s*/, "").trim(); } catch (e) {}
+  const DOMBY = {};
+  for (const p of TREE) for (const d of p.k) DOMBY[norm(d.n).trim()] = d.c;
   let n = 0;
   for (const t of list) {
     const col = norm(cols[t.boardColumnUid] || "");
@@ -169,7 +176,8 @@ async function makeDrafts() {
     const title = raw.replace(/\s*\([A-Z]{2,3}-[A-Z0-9-]+\)\s*$/, "").trim();
     const code = (m && TOP[m[1]] ? m[1] : null) || BYNAME[norm(title).replace(/\s+/g, " ").trim()] || null;
     const top = code ? TOP[code] : null;
-    const catUid = (top && (CAT.B[top.sc] || CAT.B[top.sc.split("-").slice(0, 2).join("-")])) || CAT.B._root;
+    const dom = t.internalTicket.ticketCategoryUid && DOMBY[TC[t.internalTicket.ticketCategoryUid]];
+    const catUid = (top && (CAT.B[top.sc] || CAT.B[top.sc.split("-").slice(0, 2).join("-")])) || (dom && CAT.B[dom]) || CAT.B._root;
     const files = [...(t.attachments || [])];
     try { for (const c of (await gql("GetTicketCommentAppList", TCOM_Q, { ticketUid: t.uid })).GetTicketCommentAppList) files.push(...(c.attachments || [])); } catch (e) {}
     const id = () => Math.random().toString(36).slice(2, 12);
