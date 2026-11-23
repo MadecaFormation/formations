@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-20T14:30:02.624Z",
+ "updated": "2026-11-23T11:28:07.505Z",
  "posts": [
   {
    "t": "Fondamentaux du management de projet",
@@ -31,6 +31,11 @@
  "stats": {},
  "takes": {},
  "tickets": [
+  {
+   "t": "Notes de calcul, synoptiques et schémas de principe CVC : modèles (BAT-CVC-T05-002)",
+   "c": "Sujets en cours de production",
+   "r": "Céline C."
+  },
   {
    "t": "Schémas électriques : unifilaires, développés, borniers",
    "c": "Ressource validée",
